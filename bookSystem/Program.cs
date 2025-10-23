@@ -1,5 +1,6 @@
 ﻿using bookSystem.Models;
 using bookSystem.Repositries;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<CategoryRepository>();
 builder.Services.AddScoped<BookRepository>();
-
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<LibraryContext>();
 
 // ✅ Register the DbContext
 builder.Services.AddDbContext<LibraryContext>(options =>

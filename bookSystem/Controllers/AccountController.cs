@@ -2,6 +2,7 @@
 using bookSystem.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Threading.Tasks;
 
 namespace bookSystem.Controllers
@@ -14,11 +15,16 @@ namespace bookSystem.Controllers
 
         private UserManager<ApplicationUser> userManager;
 
+        private SignInManager<ApplicationUser> SignInManager;
 
-        public AccountController(UserManager<ApplicationUser> _userManager) { 
-        
+
+
+        public AccountController(UserManager<ApplicationUser> _userManager, SignInManager<ApplicationUser> _signInManager)
+        {
+
             this.userManager = _userManager;
-       
+            this.SignInManager = _signInManager;
+
 
         }
 
@@ -32,31 +38,36 @@ namespace bookSystem.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Register( RegisterService registerService)
+        public async Task<IActionResult> Register(RegisterService registerService)
         {
-
-            if (ModelState.IsValid) {
-          //mapping 
-                ApplicationUser user = new ApplicationUser();
-                user.Address = registerService.Address;
-                user.UserName = registerService.User_name;
-                user.PasswordHash = registerService.Password;
-
-
-
-
-              IdentityResult Result =  await userManager.CreateAsync(user);
-
-                if (Result.Succeeded) {
-
-            }
-                foreach (var item in ViewData)
+            if (ModelState.IsValid)
+            {
+                // Mapping
+                var user = new ApplicationUser
                 {
-                    
+                    Address = registerService.Address,
+                    UserName = registerService.User_name
+                };
+
+                // Create user securely (this hashes the password)
+                IdentityResult result = await userManager.CreateAsync(user, registerService.Password);
+
+                if (result.Succeeded)
+                {
+                    await SignInManager.SignInAsync(user, isPersistent: false);
+                    return RedirectToAction("Index", "Category");
                 }
 
-                ApplicationUser applicationUser = new ApplicationUser();
-            return View("Register" , registerService);
+                // Add any errors to ModelState
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+
+            // If ModelState is invalid or creation failed, redisplay the form
+            return View("Register", registerService);
         }
+
     }
 }
