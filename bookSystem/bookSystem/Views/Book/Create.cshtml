@@ -1,0 +1,29 @@
+﻿@model bookSystem.Dtos.BookDto
+@{
+    ViewBag.Title = "Add Book";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Add Book</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label>Title</label>
+        <input asp-for="Title" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Author</label>
+        <input asp-for="Author" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Category</label>
+        <select asp-for="CategoryName" class="form-control">
+            @foreach (var c in ViewBag.Categories)
+            {
+                <option>@c.Name</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a class="btn btn-secondary" href="@Url.Action("Index")">Cancel</a>
+</form>
