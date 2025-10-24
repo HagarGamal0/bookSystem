@@ -3,6 +3,7 @@ using bookSystem.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace bookSystem.Controllers
@@ -68,6 +69,52 @@ namespace bookSystem.Controllers
             // If ModelState is invalid or creation failed, redisplay the form
             return View("Register", registerService);
         }
+
+        [HttpGet]
+        public IActionResult Login()
+        {
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginService loginService)
+        {
+
+            if (ModelState.IsValid)
+            {
+             ApplicationUser user = await  userManager.FindByNameAsync(loginService.User_name);
+                if (user != null)
+                {
+                 bool userFound =  await userManager.CheckPasswordAsync(user, loginService.Password);
+                    if (userFound= true)
+                    {
+
+                        List<Claim> claims = new List<Claim>();
+                        claims.Add(new Claim("userAddress", user.Address));
+
+                        await SignInManager.SignInWithClaimsAsync(user, loginService.remember_me , claims);
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+                ModelState.AddModelError("", "username or password are wrong");
+
+            }
+
+            return View();
+        }
+
+
+
+
+
+        public async Task<IActionResult> SignOut()
+        {
+
+           await SignInManager.SignOutAsync();
+            return View("Register");
+        }
+
 
     }
 }
