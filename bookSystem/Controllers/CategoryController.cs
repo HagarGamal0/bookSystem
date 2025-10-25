@@ -2,16 +2,20 @@
 using bookSystem.Models;
 using bookSystem.Repositries;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace bookSystem.Controllers
 {
     public class CategoryController : Controller
     {
         private readonly CategoryRepository _repo;
+        private readonly BookRepository _bookRepo;
 
-        public CategoryController(CategoryRepository repo)
+        public CategoryController(CategoryRepository repo, BookRepository bookRepo)
         {
             _repo = repo;
+            _bookRepo = bookRepo;
         }
 
         public async Task<IActionResult> Index()
@@ -57,6 +61,14 @@ namespace bookSystem.Controllers
             _repo.Delete(category);
             await _repo.SaveAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> GetBooksByCat(int catid)
+        {
+            var category = await _repo.GetCategoryWithBooksAsync(catid);
+            if (category == null) return NotFound();
+
+            return Json(category);
         }
     }
 }
