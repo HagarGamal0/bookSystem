@@ -9,7 +9,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<CategoryRepository>();
 builder.Services.AddScoped<BookRepository>();
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<LibraryContext>();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = false;                
+    options.Password.RequireLowercase = false;          
+    options.Password.RequireUppercase = false;         
+    options.Password.RequireNonAlphanumeric = false;    
+    options.Password.RequiredLength = 6;              
+}).AddEntityFrameworkStores<LibraryContext>();
 
 // ✅ Register the DbContext
 builder.Services.AddDbContext<LibraryContext>(options =>

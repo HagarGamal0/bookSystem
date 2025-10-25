@@ -39,6 +39,8 @@ namespace bookSystem.Controllers
             return View();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken] //request.form['requests']
+
         public async Task<IActionResult> Register(RegisterService registerService)
         {
             if (ModelState.IsValid)
@@ -55,6 +57,8 @@ namespace bookSystem.Controllers
 
                 if (result.Succeeded)
                 {
+                   await userManager.AddToRoleAsync(user, "Developer");
+                      //add to cookie
                     await SignInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Index", "Category");
                 }
@@ -78,6 +82,7 @@ namespace bookSystem.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken] //request.form['requests']
         public async Task<IActionResult> Login(LoginService loginService)
         {
 
