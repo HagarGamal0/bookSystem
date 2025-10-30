@@ -57,9 +57,11 @@ namespace bookSystem.Controllers
 
                 if (result.Succeeded)
                 {
-                   await userManager.AddToRoleAsync(user, "Developer");
+                   await userManager.AddToRoleAsync(user, "Admin");
                       //add to cookie
                     await SignInManager.SignInAsync(user, isPersistent: false);
+                    await SignInManager.RefreshSignInAsync(user);
+
                     return RedirectToAction("Index", "Category");
                 }
 
